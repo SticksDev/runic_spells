@@ -1,0 +1,4 @@
+name: runic-spells
+version: '${project.version}'
+main: me.sticksdev.runicspells.Runic_spells
+api-version: 1.19
