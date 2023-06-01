@@ -6,10 +6,12 @@ package me.sticksdev.runicspells.structures;
 public class BaseSpell {
     public String name;
     public String description;
+    public int spellID;
 
-    public BaseSpell(String name, String description) {
+    public BaseSpell(String name, String description, int spellID) {
         this.name = name;
         this.description = description;
+        this.spellID = spellID;
     }
 
     public String getName() {
@@ -18,5 +20,9 @@ public class BaseSpell {
 
     public String getDescription() {
         return description;
+    }
+
+    public int getSpellID() {
+        return spellID;
     }
 }

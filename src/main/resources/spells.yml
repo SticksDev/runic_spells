@@ -6,6 +6,9 @@
 # If you want to disable a spell, just remove it from this list
 enabledSpells:
   - "Fireball"
+  - "Earth"
+  - "Water"
+  - "Lightning"
 
 # Override blocks
 # You can override any spell as long as it's enabled in the list above

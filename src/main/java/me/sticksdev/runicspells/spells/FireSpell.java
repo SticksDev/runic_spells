@@ -2,6 +2,7 @@ package me.sticksdev.runicspells.spells;
 
 import me.sticksdev.runicspells.Runic_spells;
 import me.sticksdev.runicspells.structures.ItemBasedSpell;
+import me.sticksdev.runicspells.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -14,12 +15,12 @@ import org.bukkit.util.Vector;
 
 public class FireSpell extends ItemBasedSpell {
     public FireSpell() {
-        super("Fire Spell", "Launches a fireball projectile", "FIRE_CHARGE", 10, 25, 15, FireSpell::castFireball);
+        super("Fireball", "Launches a fireball projectile", 1,  "FIRE_CHARGE", 6, 25, 15, FireSpell::castFireball);
     }
 
     private static void castFireball(Player player, Entity nearestEntity) {
         // Launches a fireball projectile
-        Projectile fireball = player.launchProjectile(Snowball.class, getProjectileVelocity(player, nearestEntity));
+        Projectile fireball = player.launchProjectile(Snowball.class, Utils.getProjectileVelocity(player, nearestEntity));
 
         // Set the fireball's damage
         fireball.setFireTicks(100);
@@ -55,16 +56,5 @@ public class FireSpell extends ItemBasedSpell {
                 }
             }
         }.runTaskTimer(Runic_spells.getInstance(), 0L, 1L);
-    }
-
-
-    private static Vector getProjectileVelocity(Player player, Entity target) {
-        Vector direction;
-        if (target != null) {
-            direction = target.getLocation().toVector().subtract(player.getLocation().toVector());
-        } else {
-            direction = player.getEyeLocation().getDirection();
-        }
-        return direction.normalize().multiply(1.5);
     }
 }
