@@ -1,1 +1,25 @@
-# Spells configuration file
+####################
+# Spells Configuration File
+####################
+
+# Enabled Spells
+# If you want to disable a spell, just remove it from this list
+enabledSpells:
+  - "Fireball"
+
+# Override blocks
+# You can override any spell as long as it's enabled in the list above
+# Example would be
+# Fireball:
+#   OverrideTool: "DIAMOND_HOE"
+#   OverrideManaCost: 10
+#   OverrideCooldown: 10
+#   OverrideDamage: 10
+# By default, this is commented out
+
+# overrideSpells:
+#  Fireball:
+#    OverrideTool: "DIAMOND_HOE"
+#    OverrideManaCost: 10
+#    OverrideCooldown: 10
+#    OverrideDamage: 10
