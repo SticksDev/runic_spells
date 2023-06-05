@@ -1,7 +1,6 @@
 package me.sticksdev.runicspells.handlers;
 
 import me.sticksdev.runicspells.Runic_spells;
-import me.sticksdev.runicspells.structures.ItemBasedSpell;
 import me.sticksdev.runicspells.utils.Redis;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -13,15 +12,28 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import redis.clients.jedis.JedisPooled;
 
+/**
+ * Handles mana
+ */
 public class ManaHandler implements Listener {
     private final Redis redis = Runic_spells.getInstance().getRedisHandler();
     private final JedisPooled pool = redis.getPool();
     private BukkitRunnable manaTimer;
 
+    /**
+     * Sets the mana of a player
+     *
+     * @param uuid The UUID of the player
+     * @param mana The amount of mana to set
+     */
     public void setMana(String uuid, int mana) {
         pool.set(uuid + ":mana", String.valueOf(mana));
     }
 
+    /**
+     * Creates the main BukkitRunnable for the mana timer to regenerate mana
+     * This is called in the onEnable() method of the main class
+     */
     public void startTimers() {
         manaTimer = new BukkitRunnable() {
             @Override
@@ -56,10 +68,20 @@ public class ManaHandler implements Listener {
         manaTimer.runTaskTimer(Runic_spells.getInstance(), 0, 20);
     }
 
+    /**
+     * Cancels the mana timer
+     * This is called in the onDisable() method of the main class
+     */
     public void destroyTimers() {
         manaTimer.cancel();
     }
 
+    /**
+     * Gets the mana of a player
+     *
+     * @param uuid The UUID of the player
+     * @return The amount of mana the player has
+     */
     public int getMana(String uuid) {
         String mana = pool.get(uuid + ":mana");
 
@@ -70,6 +92,12 @@ public class ManaHandler implements Listener {
         return Integer.parseInt(mana);
     }
 
+    /**
+     * Adds mana to a player and updates their EXP bar
+     *
+     * @param player The player to add mana to
+     * @param mana   The amount of mana to add
+     */
     public void addMana(Player player, int mana) {
         String uuid = player.getUniqueId().toString();
         int currentMana = getMana(uuid);
@@ -77,6 +105,12 @@ public class ManaHandler implements Listener {
         setEXPBar(player);
     }
 
+    /**
+     * Removes mana from a player and updates their EXP bar
+     *
+     * @param player The player to remove mana from
+     * @param mana   The amount of mana to remove
+     */
     public void removeMana(Player player, int mana) {
         String uuid = player.getUniqueId().toString();
         int currentMana = getMana(uuid);
@@ -85,21 +119,34 @@ public class ManaHandler implements Listener {
     }
 
 
+    /**
+     * Sets the EXP bar of a player to their current mana
+     *
+     * @param player The player to set the EXP bar of
+     */
     public void setEXPBar(Player player) {
         int mana = getMana(player.getUniqueId().toString());
         player.setExp((float) mana / 100);
     }
 
-    public void refundSpell(Player player, ItemBasedSpell spell) {
-        addMana(player, spell.getManaCost());
-        setEXPBar(player);
-    }
 
+    /**
+     * Checks if a player can cast a spell
+     *
+     * @param player   The player to check
+     * @param manaCost The mana cost of the spell
+     * @return Whether the player can cast the spell
+     */
     public boolean canCast(Player player, int manaCost) {
         return getMana(player.getUniqueId().toString()) >= manaCost;
     }
 
-    // On player join
+    /**
+     * On player join, check if they have mana, if not, set it to 100
+     * If they do, set their EXP bar to their current mana
+     *
+     * @param event The PlayerJoinEvent
+     */
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         boolean exists = pool.exists(event.getPlayer().getUniqueId() + ":mana");

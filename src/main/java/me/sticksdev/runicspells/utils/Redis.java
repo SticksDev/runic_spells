@@ -1,12 +1,13 @@
 package me.sticksdev.runicspells.utils;
-
 import me.sticksdev.runicspells.Runic_spells;
-import redis.clients.jedis.CommandObject;
 import redis.clients.jedis.JedisPooled;
-import redis.clients.jedis.params.SetParams;
 
-import java.util.HashMap;
 
+/**
+ * Redis connection handler
+ * This class is used to handle the Redis connections and
+ * operations for the plugin
+ */
 public class Redis {
     private final Runic_spells plugin = Runic_spells.getInstance();
     private final String host = plugin.getConfigHandler().getConfig().getString("redis.host");
@@ -15,6 +16,9 @@ public class Redis {
     // Create a new JedisPooled instance
     private static JedisPooled pool;
 
+    /**
+     * Initialize the Redis connection for the current instance
+     */
     public void init() {
         try {
             Logger.info("Connecting to Redis...");
@@ -31,10 +35,19 @@ public class Redis {
         }
     }
 
+    /**
+     * Gets the current pool handle of the instance
+     *
+     * @return JedisPooled instance
+     */
     public JedisPooled getPool() {
         return pool;
     }
 
+    /**
+     * Shuts down the current Redis connection
+     * This is only called on plugin disable
+     */
     public void close() {
         pool.close();
     }

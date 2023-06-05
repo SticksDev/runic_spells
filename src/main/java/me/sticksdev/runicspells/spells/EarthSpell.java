@@ -1,5 +1,4 @@
 package me.sticksdev.runicspells.spells;
-
 import me.sticksdev.runicspells.Runic_spells;
 import me.sticksdev.runicspells.structures.ItemBasedSpell;
 import me.sticksdev.runicspells.utils.Utils;
@@ -11,10 +10,12 @@ import org.bukkit.World;
 
 public class EarthSpell extends ItemBasedSpell {
     public EarthSpell() {
-        super("Earth", "Launches an earth projectile", 2, "DIRT", 25, 40, 15, EarthSpell::castEarth);
+        super("Earth", "Launches an earth projectile", 2, 10, "DIRT", 25, 40, 15, true, EarthSpell::castEarth);
     }
 
     private static void castEarth(Player player, Entity nearestEntity) {
+        EarthSpell earthSpell = new EarthSpell();
+
         // Launches an earth projectile
         Projectile earth = player.launchProjectile(Snowball.class, Utils.getProjectileVelocity(player, nearestEntity));
 
@@ -41,10 +42,16 @@ public class EarthSpell extends ItemBasedSpell {
 
                                         // Set the fuse ticks to 40 (2 seconds)
                                         tnt.setFuseTicks(40);
+                                        tnt.setIsIncendiary(false);
                                     }
                                 }
                             }
                         }
+                    }
+
+                    if (nearestEntity instanceof LivingEntity) {
+                        // Damage the nearest entity
+                        ((LivingEntity) nearestEntity).damage(earthSpell.getDamage());
                     }
 
                     // Cancel the task

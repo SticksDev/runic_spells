@@ -3,10 +3,7 @@ package me.sticksdev.runicspells.spells;
 import me.sticksdev.runicspells.Runic_spells;
 import me.sticksdev.runicspells.structures.ItemBasedSpell;
 import me.sticksdev.runicspells.utils.Utils;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Snowball;
+import org.bukkit.entity.*;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,12 +11,13 @@ import org.bukkit.World;
 
 public class WaterSpell extends ItemBasedSpell {
     public WaterSpell() {
-        super("Water", "Launches a water projectile", 3,  "WATER_BUCKET", 3, 10, 0, WaterSpell::castWater);
+        super("Water", "Launches a water projectile", 3, 15, "WATER_BUCKET", 3, 10, 0, true, WaterSpell::castWater);
     }
 
     private static void castWater(Player player, Entity nearestEntity) {
         // Launches a water projectile
         Projectile water = player.launchProjectile(Snowball.class, Utils.getProjectileVelocity(player, nearestEntity));
+        WaterSpell waterSpell = new WaterSpell();
 
         // Wait for it to hit something
         new BukkitRunnable() {
@@ -45,6 +43,11 @@ public class WaterSpell extends ItemBasedSpell {
                                 }
                             }
                         }
+                    }
+
+                    if (nearestEntity instanceof LivingEntity) {
+                        // Damage the nearest entity
+                        ((LivingEntity) nearestEntity).damage(waterSpell.getDamage());
                     }
 
                     // Cancel the task

@@ -18,6 +18,7 @@ enabledSpells:
 #   OverrideManaCost: 10
 #   OverrideCooldown: 10
 #   OverrideDamage: 10
+#   OverrideRange: 10
 # By default, this is commented out
 
 # overrideSpells:
@@ -26,3 +27,4 @@ enabledSpells:
 #    OverrideManaCost: 10
 #    OverrideCooldown: 10
 #    OverrideDamage: 10
+#    OverrideRange: 10

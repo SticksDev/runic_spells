@@ -11,11 +11,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Snowball;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 public class FireSpell extends ItemBasedSpell {
     public FireSpell() {
-        super("Fireball", "Launches a fireball projectile", 1,  "FIRE_CHARGE", 6, 25, 15, FireSpell::castFireball);
+        super("Fireball", "Launches a fireball projectile", 1, 15, "FIRE_CHARGE", 6, 25, 15, true, FireSpell::castFireball);
     }
 
     private static void castFireball(Player player, Entity nearestEntity) {

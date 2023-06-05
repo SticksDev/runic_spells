@@ -11,19 +11,28 @@ import me.sticksdev.runicspells.utils.Yaml;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.Material;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.HashMap;
 
+/**
+ * Handles all spells
+ */
 public class SpellHandler {
     public static HashMap<String, ItemBasedSpell> itemBasedSpells = new HashMap<>();
     private static final Yaml config = Runic_spells.getInstance().getConfigHandler();
     private static final Runic_spells plugin = Runic_spells.getInstance();
 
 
+    /**
+     * Registers an item-based spell
+     *
+     * @param spell The spell to register
+     */
     public static void registerItemSpell(ItemBasedSpell spell) {
         // Check if the item provided is a valid material
         try {
-            Material itemMaterial = Material.valueOf(spell.getItem());
+            Material.valueOf(spell.getItem());
         } catch (IllegalArgumentException e) {
             Logger.warning("Spell " + spell.getName() + " has an invalid item material!");
             Logger.warning("Provided material: " + spell.getItem());
@@ -61,10 +70,23 @@ public class SpellHandler {
         Logger.info("Registered spell " + spell.getName() + "!");
     }
 
+    /**
+     * Gets an item-based spell by name
+     *
+     * @param name The name of the spell
+     * @return The spell
+     */
     public static ItemBasedSpell getItemSpell(String name) {
         return itemBasedSpells.get(name);
     }
 
+    /**
+     * Executes an item-based spell
+     *
+     * @param name          The name of the spell
+     * @param player        The player who cast the spell
+     * @param nearestEntity The nearest entity to the player
+     */
     public void executeSpell(String name, Player player, Entity nearestEntity) {
         ItemBasedSpell spell = getItemSpell(name);
         if (spell != null) {
@@ -72,6 +94,9 @@ public class SpellHandler {
         }
     }
 
+    /**
+     * Registers all spells (called on plugin startup)
+     */
     public static void registerSpells() {
         // Register spells
         Logger.info("Registering spells...");
@@ -80,5 +105,20 @@ public class SpellHandler {
         registerItemSpell(new EarthSpell());
         registerItemSpell(new LightningSpell());
         Logger.info("Registered " + itemBasedSpells.size() + " spells!");
+    }
+
+    /**
+     * Reloads all spells (called on plugin reload)
+     */
+    public void reload() {
+        // Clear all listeners for spells
+        Logger.info("Clearing all spell listeners...");
+
+        // Remove PlayerInteractEvent listeners
+        PlayerInteractEvent.getHandlerList().unregister(plugin);
+
+        // Clear registered spells and re-initialize
+        itemBasedSpells.clear();
+        registerSpells();
     }
 }

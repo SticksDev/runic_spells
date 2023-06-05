@@ -2,3 +2,10 @@ name: runic-spells
 version: '${project.version}'
 main: me.sticksdev.runicspells.Runic_spells
 api-version: 1.19
+
+commands:
+  reloadrs:
+    description: Reloads the plugin and configuration files.
+    usage: /<command>
+    permission: runicspells.reload
+    aliases: [ rl ]

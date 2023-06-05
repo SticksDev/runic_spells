@@ -11,6 +11,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * YAML file handler
+ * This class is used to handle the YAML files for the plugin (spells and config)
+ */
 public class Yaml {
     // Basic YAML Loader and data holder for minecraft plugins
     private final Runic_spells plugin = Runic_spells.getInstance();
@@ -96,6 +100,12 @@ public class Yaml {
         return configConfig;
     }
 
+    /**
+     * Returns the spell overrides for a given spell
+     *
+     * @param spellName Name of the spell to get overrides for
+     * @return SpellOverride object or null if no overrides are found
+     */
     @Nullable
     public SpellOverride getSpellOverrides(String spellName) {
         ConfigurationSection spellOverridesBlock = getSpellsConfig().getConfigurationSection("overrideSpells");
@@ -113,14 +123,21 @@ public class Yaml {
         }
 
         String overrideSpellTool = spellOverrides.getString("OverrideTool");
-        String overrideManaCost = spellOverrides.getString("OverrideManaCost");
-        String overrideCooldown = spellOverrides.getString("OverrideCooldown");
-        String overrideDamage = spellOverrides.getString("OverrideDamage");
+        int overrideManaCost = spellOverrides.getInt("OverrideManaCost", 0);
+        int overrideCooldown = spellOverrides.getInt("OverrideCooldown", 0);
+        int overrideDamage = spellOverrides.getInt("OverrideDamage", 0);
+        int overrideRange = spellOverrides.getInt("OverrideRange", 0);
 
-        return new SpellOverride(overrideSpellTool, overrideManaCost, overrideCooldown, overrideDamage);
+        return new SpellOverride(overrideSpellTool, overrideManaCost, overrideCooldown, overrideDamage, overrideRange);
     }
 
 
+    /**
+     * Returns whether a spell is enabled in the config
+     *
+     * @param spellName Name of the spell to check
+     * @return boolean
+     */
     public boolean getIsSpellEnabled(String spellName) {
         // Check if it's in the enabledSpells list
         List<?> enabledSpells = getSpellsConfig().getList("enabledSpells");
@@ -131,5 +148,13 @@ public class Yaml {
         }
 
         return enabledSpells.contains(spellName);
+    }
+
+    /**
+     * Reloads the config file(s)
+     */
+    public void reload() {
+        destroy();
+        init();
     }
 }

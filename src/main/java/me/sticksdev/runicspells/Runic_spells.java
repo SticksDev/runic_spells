@@ -1,5 +1,6 @@
 package me.sticksdev.runicspells;
 
+import me.sticksdev.runicspells.commands.ReloadCmd;
 import me.sticksdev.runicspells.handlers.CooldownHandler;
 import me.sticksdev.runicspells.handlers.ManaHandler;
 import me.sticksdev.runicspells.handlers.SpellHandler;
@@ -13,6 +14,7 @@ public final class Runic_spells extends JavaPlugin {
     private static Yaml config;
     private static CooldownHandler cooldownHandler;
     private static ManaHandler manaHandler;
+    private static SpellHandler spellHandler;
 
     @Override
     public void onEnable() {
@@ -38,7 +40,11 @@ public final class Runic_spells extends JavaPlugin {
         getServer().getPluginManager().registerEvents(manaHandler, this);
 
         // Register spells
+        spellHandler = new SpellHandler();
         SpellHandler.registerSpells();
+
+        // Register commands
+        getCommand("reloadrs").setExecutor(new ReloadCmd());
     }
 
     @Override
@@ -66,5 +72,9 @@ public final class Runic_spells extends JavaPlugin {
 
     public ManaHandler getManaHandler() {
         return manaHandler;
+    }
+
+    public SpellHandler getSpellHandler() {
+        return spellHandler;
     }
 }

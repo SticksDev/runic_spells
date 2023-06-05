@@ -19,18 +19,37 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 
+/**
+ * The main spells class that most spells extend from
+ * This class is used for spells that use an item to cast (e.g. a stick)
+ */
 public class ItemBasedSpell extends BaseSpell implements Listener {
     // Spell that uses Minecraft in-game item to use/cast
     private String item;
     private int cooldown;
     private int manaCost;
     private int damage;
-    private final BiConsumer<Player, Entity> castHandler;
+    private boolean requiresNearbyEntity;
+    private BiConsumer<Player, Entity> castHandler;
     private final CooldownHandler cooldownHandler = Runic_spells.getInstance().getCooldownHandler();
     private final ManaHandler manaHandler = Runic_spells.getInstance().getManaHandler();
 
-    public ItemBasedSpell(String name, String description, int spellId, String item, int cooldown, int manaCost, int damage, BiConsumer<Player, Entity> castHandler) {
-        super(name, description, spellId);
+    /**
+     * Creates a new ItemBasedSpell object. All parameters are required (some are pulled from BaseSpell).
+     *
+     * @param name                 The name of the spell
+     * @param description          The description of the spell
+     * @param spellId              The ID of the spell
+     * @param range                The range of the spell (how far away it can be cast, in blocks)
+     * @param item                 The item to cast the spell with (e.g. "stick")
+     * @param cooldown             The cooldown of the spell (in seconds)
+     * @param manaCost             The mana cost of the spell
+     * @param damage               The damage to the spell (NOTE: some spells may not use this due to API limitations)
+     * @param requiresNearbyEntity Whether the spell requires a nearby entity to cast
+     * @param castHandler          The handler to run when the spell is cast
+     */
+    public ItemBasedSpell(String name, String description, int spellId, int range, String item, int cooldown, int manaCost, int damage, boolean requiresNearbyEntity, BiConsumer<Player, Entity> castHandler) {
+        super(name, description, range, spellId);
         this.name = name;
         this.description = description;
         this.item = item;
@@ -38,47 +57,105 @@ public class ItemBasedSpell extends BaseSpell implements Listener {
         this.manaCost = manaCost;
         this.castHandler = castHandler;
         this.damage = damage;
+        this.requiresNearbyEntity = requiresNearbyEntity;
+        this.range = range;
     }
 
+    /**
+     * Gets the item to cast the spell with
+     *
+     * @return The item to cast the spell with
+     */
     public String getItem() {
         return item;
     }
 
+    /**
+     * Sets the item to cast the spell with
+     *
+     * @param item The item to cast the spell with
+     */
     public void setItem(String item) {
         this.item = item;
     }
 
+    /**
+     * Gets the cooldown of the spell
+     *
+     * @return The cooldown of the spell
+     */
     public int getCooldown() {
         return cooldown;
     }
 
+    /**
+     * Sets the cooldown of the spell
+     *
+     * @param cooldown The cooldown of the spell
+     */
     public void setCooldown(int cooldown) {
         this.cooldown = cooldown;
     }
 
+    /**
+     * Gets the mana cost of the spell
+     *
+     * @return The mana cost of the spell
+     */
     public int getManaCost() {
         return manaCost;
     }
 
+    /**
+     * Sets the mana cost of the spell
+     *
+     * @param manaCost The mana cost of the spell
+     */
     public void setManaCost(int manaCost) {
         this.manaCost = manaCost;
     }
 
+    /**
+     * Calls the BiConsumer cast handler of the spell and then casts the spell
+     */
     public void cast(Player player, Entity nearestEntity) {
         if (castHandler != null) {
             castHandler.accept(player, nearestEntity);
         }
     }
 
+    /**
+     * Gets the damage of the spell
+     *
+     * @return The damage of the spell
+     */
     public int getDamage() {
         return damage;
     }
 
+    /**
+     * Sets the damage of the spell
+     *
+     * @param damage The damage of the spell
+     */
     public void setDamage(int damage) {
         this.damage = damage;
     }
 
-    // Listen to the interact event for only the item specified
+    /**
+     * Sets the spell's range (how far away it can be cast, in blocks)
+     *
+     * @param range The spell's range (how far away it can be cast, in blocks)
+     */
+    public void setRange(int range) {
+        this.range = range;
+    }
+
+    /**
+     * The main handler for spells that use an item to cast
+     *
+     * @param event The PlayerInteractEvent
+     */
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         // TODO: Little messy, could clean this up later
@@ -94,8 +171,22 @@ public class ItemBasedSpell extends BaseSpell implements Listener {
                     // No cooldown check if they have enough mana
                     boolean canCast = manaHandler.canCast(player, this.manaCost);
                     if (canCast) {
-                        // They have enough mana, so cast the spell
-                        cast(player, event.getPlayer().getNearbyEntities(10, 10, 10).stream().findFirst().orElse(null));
+                        // Get nearest entity (in player's line of sight)
+                        Entity nearestEntity = player.getTargetEntity(this.range);
+                        if (nearestEntity == null && requiresNearbyEntity) {
+                            // No entity found, so tell them
+                            final TextComponent manaMessage = Component.text()
+                                    .append(Component.text("[!]", NamedTextColor.RED, TextDecoration.BOLD))
+                                    .append(Component.text(" Could not find a nearby entity or player to cast "))
+                                    .append(Component.text(this.name, NamedTextColor.BLUE, TextDecoration.BOLD))
+                                    .append(Component.text("!"))
+                                    .build();
+
+                            player.sendMessage(manaMessage);
+                            return;
+                        }
+
+                        cast(player, nearestEntity);
                         cooldownHandler.setCooldown(player, this, this.cooldown);
                         manaHandler.removeMana(player, this.manaCost);
 
@@ -138,6 +229,11 @@ public class ItemBasedSpell extends BaseSpell implements Listener {
         }
     }
 
+    /**
+     * Set's the spell's overrides
+     *
+     * @param overrides The spell's overrides (nullable)
+     */
     public void setOverrides(@Nullable SpellOverride overrides) {
         if (overrides != null) {
             if (overrides.OverrideTool != null) {
@@ -163,6 +259,10 @@ public class ItemBasedSpell extends BaseSpell implements Listener {
             if (overrides.OverrideDamage != null && overrides.OverrideDamage != 0) {
                 this.damage = overrides.OverrideDamage;
                 Logger.info("Overriding damage for spell " + this.name + " to " + overrides.OverrideDamage);
+            }
+            if (overrides.OverrideRange != null && overrides.OverrideRange != 0) {
+                this.range = overrides.OverrideRange;
+                Logger.info("Overriding range for spell " + this.name + " to " + overrides.OverrideRange);
             }
         } else {
             Logger.warning("setOverrides() was called for spell " + this.name + " but no overrides were provided - falling back to defaults.");
