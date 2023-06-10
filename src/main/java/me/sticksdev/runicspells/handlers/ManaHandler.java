@@ -8,6 +8,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import redis.clients.jedis.JedisPooled;
@@ -158,5 +159,16 @@ public class ManaHandler implements Listener {
         } else {
             setEXPBar(player);
         }
+    }
+
+    /**
+     * On player death reset the expbar to their current mana
+     *
+     * @param event The PlayerDeathEvent
+     */
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Player player = event.getPlayer();
+        setEXPBar(player);
     }
 }

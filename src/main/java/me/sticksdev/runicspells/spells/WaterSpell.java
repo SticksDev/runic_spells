@@ -45,9 +45,9 @@ public class WaterSpell extends ItemBasedSpell {
                         }
                     }
 
-                    if (nearestEntity instanceof LivingEntity) {
+                    if (nearestEntity instanceof LivingEntity LE) {
                         // Damage the nearest entity
-                        ((LivingEntity) nearestEntity).damage(waterSpell.getDamage());
+                        LE.damage(waterSpell.getDamage());
                     }
 
                     // Cancel the task

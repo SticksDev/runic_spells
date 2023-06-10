@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 public class LightningSpell extends ItemBasedSpell {
     public LightningSpell() {
-        super("Lightning", "Strikes lightning at the target", 4, 25, "BLAZE_ROD", 3, 10, 0, true, LightningSpell::castLightning);
+        super("Lightning", "Strikes lightning at the target", 4, 25, "BLAZE_ROD", 3, 10, 10, true, LightningSpell::castLightning);
     }
 
     private static void castLightning(Player player, Entity nearestEntity) {
@@ -21,8 +21,8 @@ public class LightningSpell extends ItemBasedSpell {
 
         world.strikeLightningEffect(location);
 
-        if (nearestEntity instanceof LivingEntity) {
-            ((LivingEntity) nearestEntity).damage(lightningSpell.getDamage());
+        if (nearestEntity instanceof LivingEntity LE) {
+            LE.damage(lightningSpell.getDamage());
         }
     }
 }

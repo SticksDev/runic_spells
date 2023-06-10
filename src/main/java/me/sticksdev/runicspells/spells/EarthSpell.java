@@ -49,9 +49,9 @@ public class EarthSpell extends ItemBasedSpell {
                         }
                     }
 
-                    if (nearestEntity instanceof LivingEntity) {
+                    if (nearestEntity instanceof LivingEntity LE) {
                         // Damage the nearest entity
-                        ((LivingEntity) nearestEntity).damage(earthSpell.getDamage());
+                        LE.damage(earthSpell.getDamage());
                     }
 
                     // Cancel the task

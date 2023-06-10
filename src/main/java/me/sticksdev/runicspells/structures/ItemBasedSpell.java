@@ -15,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
@@ -50,15 +51,12 @@ public class ItemBasedSpell extends BaseSpell implements Listener {
      */
     public ItemBasedSpell(String name, String description, int spellId, int range, String item, int cooldown, int manaCost, int damage, boolean requiresNearbyEntity, BiConsumer<Player, Entity> castHandler) {
         super(name, description, range, spellId);
-        this.name = name;
-        this.description = description;
         this.item = item;
         this.cooldown = cooldown;
         this.manaCost = manaCost;
         this.castHandler = castHandler;
         this.damage = damage;
         this.requiresNearbyEntity = requiresNearbyEntity;
-        this.range = range;
     }
 
     /**
@@ -158,11 +156,12 @@ public class ItemBasedSpell extends BaseSpell implements Listener {
      */
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        // TODO: Little messy, could clean this up later
-        if (event.getItem() != null && event.getItem().getType() != Material.AIR &&
-                event.getAction() != Action.RIGHT_CLICK_BLOCK && event.getAction() != Action.LEFT_CLICK_BLOCK &&
-                (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_AIR)) {
-            if (event.getItem() != null && event.getItem().getType().toString().equals(item)) {
+        final ItemStack eventItem = event.getItem();
+        final Action eventAction = event.getAction();
+
+        if (eventItem != null && eventItem.getType() != Material.AIR &&
+                (eventAction == Action.RIGHT_CLICK_AIR || eventAction == Action.LEFT_CLICK_AIR)) {
+            if (eventItem.getType().toString().equals(item)) {
                 // Check if they have an active cooldown
                 Player player = event.getPlayer();
                 double cooldown = cooldownHandler.getCooldown(player, this);
